@@ -1,141 +1,144 @@
-# Emoncms
-
-Emoncms is an open-source web application for processing, logging and visualising energy, temperature and other environmental data and is part of the [OpenEnergyMonitor project](http://openenergymonitor.org).
-
-![Emoncms](emoncms_graphic.png)
-
-## Requirements
-
-- PHP (tested with 8.1.12) 
-- MySQL or MariaDB (tested with 10.5.15) 
-- Apache (tested with 2.4.54)
-- Redis* (tested with 6.0.16)
-
-_*Redis is recommended because it reduces the number of disk writes and therefore prolongs disk life (noticeably on SD cards e.g. Raspberry Pi). Some input-processors also require Redis and fail silently if Redis is not installed. Some environments such as shared hosting or as far as we have tried Windows servers don't support Redis hence why Emoncms has a fall back mode that allows core operation without Redis._
-
-## Documentation
-
-**View the Emoncms documentation at: [https://docs.openenergymonitor.org/emoncms](https://docs.openenergymonitor.org/emoncms)**
-
-- [Getting started emonPi/Base](https://docs.openenergymonitor.org/emoncms/intro-rpi.html)
-- [Getting started emoncms.org](https://docs.openenergymonitor.org/emoncms/intro-remote.html)
-- [Emoncms Core Concepts](https://docs.openenergymonitor.org/emoncms/coreconcepts.html)
-- [Posting data](https://docs.openenergymonitor.org/emoncms/postingdata.html)
-- [MQTT](https://docs.openenergymonitor.org/emoncms/mqtt.html)
-- [View Graphs](https://docs.openenergymonitor.org/emoncms/graphs.html)
-- [Dashboard Builder](https://docs.openenergymonitor.org/emoncms/dashboards.html)
-- [Application dashboards](https://docs.openenergymonitor.org/emoncms/dashboards.html)
-- [Octopus Agile app](https://docs.openenergymonitor.org/emoncms/agileapp.html)
-- [Calculating Daily kWh](https://docs.openenergymonitor.org/emoncms/daily-kwh.html)
-- [Calculating Averages](https://docs.openenergymonitor.org/emoncms/daily-averages.html)
-- [Pulse counting](https://docs.openenergymonitor.org/emoncms/pulse-counting.html)
-- [Exporting CSV](https://docs.openenergymonitor.org/emoncms/export-csv.html)
-- [Histograms](https://docs.openenergymonitor.org/emoncms/histograms.html)
-- [Post Process module](https://docs.openenergymonitor.org/emoncms/postprocess.html)
-- [DemandShaper module](https://docs.openenergymonitor.org/emoncms/demandshaper.html)
-- [Import / Backup](https://docs.openenergymonitor.org/emoncms/import.html)
-- [Update & Upgrade](https://docs.openenergymonitor.org/emoncms/update.html)
-- [Remote Access](https://docs.openenergymonitor.org/emoncms/remoteaccess.html)
-- [Troubleshooting](https://docs.openenergymonitor.org/emoncms/troubleshooting.html)
-
-**Design**
-
-- [Emoncms architecture](docs/design/architecture.md)
-- [Input processing implementation](docs/design/input-processing.md)
-- [Developing a new Module](docs/design/developing-a-new-module.md)
-- [Global variables in Emoncms](docs/design/global-variables.md)
-
-**Emoncms timeseries database design (feed storage)**
-
-- [Emoncms time series database development history](docs/timeseries/History.md)
-- [Fixed interval time series](docs/timeseries/Fixed-interval.md)
-- [Variable interval time series](docs/timeseries/Variable-interval.md)
-- [Improving write performance with buffering](docs/timeseries/Write-load-investigation.md)
-
-**Other**
-
-- [Backup](docs/Backup.md)
-- [CLI](docs/CLI.md)
-- [Encrypted Input](docs/input_encrypted.md)
-
-**Emoncms Terminology**
-
-- **Input:** An incoming datasource. Each input has an associated "node" identifier and a "key" sub-identifier. Inputs are entry points, only the last value and time of the input is recorded. To record historic data a feed needs to be created from an input.
-- **Input: Node:** A grouping identifier for an input or feed.
-- **Input: Key:** A sub-identifier for items within each Node.
-- **Input process list (or input processing):** A list of processes* performed sequentially on each input value as it is received on that input.
-- **Process:** A function that can be attached to the process list of an input to change the value or to save the value to a feed*.
-- **Feed:** A place where data is recorded, a time-series of datapoints. The standard time-series databases used by Emoncms are PHPFina and PHPTimeSeries and were written as part of the Emoncms project.
-
-* For a description of what each input process does in Emoncms, see the helper note within the Emoncms input processing configuration interface.
-
-**Emoncms.org API Reference**
-
-- [Input API reference](https://emoncms.org/site/api#input)
-- [Feed API reference](https://emoncms.org/site/api#feed)
-
-## Install
-
-Emoncms is designed and tested to run on either Ubuntu Linux (Local, Dedicated machine or VPS) or RaspberryPi OS. It should work on other Debian Linux systems though we dont test or provide documentation for installation on these. 
-
-We do not recommend and are unable to support installation on shared hosting or XAMPP servers, shared hosting in particular has no or limited capabilities for running some of the scripts used by emoncms. There is now a large choice of low cost miniature Linux VPS hosting solutions that provide a much better installation environment at similar cost.
-
-Recommended: 
-
-* [Install with emonScripts](https://docs.openenergymonitor.org/emonsd/install.html)
-* [Pre built emonSD SD-card Image Download](https://docs.openenergymonitor.org/emonsd/download.html)
-* [Purchase pre-loaded SD card](http://shop.openenergymonitor.com/emonsd-pre-loaded-raspberry-pi-sd-card/)
-
-Experimental (not currently up to date):
-
-* [Multi-platform using Docker Container](https://github.com/emoncms/emoncms-docker)
-
-## Modules
-
-Modules can be installed by downloading or git cloning into the emoncms/Modules folder. Be sure to check for database updates in Administration menu after installing new modules. The following core modules are included on the emonSD image:
-
-- [Graph module](https://github.com/emoncms/graph) - Advanced graphing module that integrates with the emoncms feed list, highly recommended; examples of use can be found in emoncms guide [[1]](http://guide.openenergymonitor.org/setup/daily-kwh)[[2]](http://guide.openenergymonitor.org/setup/daily-averages/)[[3]](http://guide.openenergymonitor.org/setup/export-csv/)[[4]](http://guide.openenergymonitor.org/setup/histograms).
-
-- [Device module](https://github.com/emoncms/device) - Automatically configure inputs and feeds using device templates.
-
-- [Dashboards module](https://github.com/emoncms/dashboard) - Required for creating, viewing and publishing dashboards.
-
-- [App module](https://github.com/emoncms/app.git) - Application specific dashboards e.g. MyElectric, MySolar.
-
-- [Config]( https://github.com/emoncms/config.git) - In-browser emonhub.conf editor and emonhub.log log viewer. Use `git clone` to install.
-
-- [Wifi module]( https://github.com/emoncms/wifi.git) - [Wifi configuration interface designed for use on the emonPi](https://guide.openenergymonitor.org/setup/connect/)
-
-- [Raspberry Pi Backup / Restore module](https://github.com/emoncms/backup) (emonPi / emonBase)
-
-- [Sync module](https://github.com/emoncms/sync)
-
-- [Usefulscripts](https://github.com/emoncms/usefulscripts): Not strictly a module, more a collection of useful scripts for use with emoncms.
-
-- [DemandShaper module]( http://github.com/emoncms/demandshaper) - Schedule smartplugs, EmonEVSE smart EV chargers, heatpumps to run at best time in terms of: carbon, cost, grid strain. Based on day ahead forecasts.
-
-There are many other available modules such as the event module and openbem (open source building energy modelling module): check out the [Emoncms repo list](https://github.com/emoncms).
-
-## Branches
-
-* [master](https://github.com/emoncms/emoncms) - The latest and greatest developments. Potential bugs, use at your own risk! All pull-requests should be made to the *master* branch.
-
-* [stable](https://github.com/emoncms/emoncms/tree/stable) - emonPi/emonBase release branch, regularly merged from master. Slightly more tried and tested. [See release change log](https://github.com/emoncms/emoncms/releases).
-
-## Tools
-
-* [PHPFina data file viewer](https://github.com/trystanlea/phpfinaview) - Easily explore phpfina timeseries feed engine data files directly without a full Emoncms installation. Useful for checking backups and archived data.
-
-#### Android App
-
-[Google Play](https://play.google.com/store/apps/details?id=org.emoncms.myapps&hl=en_GB)
-
-[GitHub Repo](https://github.com/emoncms/AndroidApp)
-
-[Development Forum](https://community.openenergymonitor.org/c/emoncms/mobile-app)
-
-## More information
-
-- Cloud hosted platform - http://emoncms.org
-- [OpenEnergyMonitor Forums](https://community.openenergymonitor.org)
-- [OpenEnergyMonitor Homepage](https://openenergymonitor.org)
+<div class="Box-sc-g0xbh4-0 bJMeLZ js-snippet-clipboard-copy-unpositioned" data-hpc="true"><article class="markdown-body entry-content container-lg" itemprop="text"><div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">埃蒙CMS</font></font></h1><a id="user-content-emoncms" class="anchor" aria-label="永久链接：Emoncms" href="#emoncms"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms 是一个开源 Web 应用程序，用于处理、记录和可视化能源、温度和其他环境数据，是 OpenEnergyMonitor 项目的</font></font><a href="http://openenergymonitor.org" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">一部分</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/emoncms/emoncms/blob/master/emoncms_graphic.png"><img src="/emoncms/emoncms/raw/master/emoncms_graphic.png" alt="埃蒙CMS" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">要求</font></font></h2><a id="user-content-requirements" class="anchor" aria-label="永久链接：要求" href="#requirements"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PHP（使用 8.1.12 测试）</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">MySQL 或 MariaDB（使用 10.5.15 测试）</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Apache（使用 2.4.54 测试）</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Redis*（使用 6.0.16 测试）</font></font></li>
+</ul>
+<p dir="auto"><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">*建议使用 Redis，因为它可以减少磁盘写入次数，从而延长磁盘寿命（尤其是在 SD 卡上，例如 Raspberry Pi）。</font><font style="vertical-align: inherit;">某些输入处理器还需要 Redis，如果未安装 Redis，则会默默地失败。</font><font style="vertical-align: inherit;">某些环境（例如共享托管或我们尝试过的 Windows 服务器）不支持 Redis，因此 Emoncms 有一个回退模式，允许在没有 Redis 的情况下进行核心操作。</font></font></em></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">文档</font></font></h2><a id="user-content-documentation" class="anchor" aria-label="永久链接：文档" href="#documentation"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">查看 Emoncms 文档： https: </font></font><a href="https://docs.openenergymonitor.org/emoncms" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">//docs.openenergymonitor.org/emoncms</font></font></a></strong></p>
+<ul dir="auto">
+<li><a href="https://docs.openenergymonitor.org/emoncms/intro-rpi.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">开始使用 emonPi/Base</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/intro-remote.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">开始使用 emoncms.org</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/coreconcepts.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms 核心概念</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/postingdata.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">发布数据</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/mqtt.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">MQTT</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/graphs.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">查看图表</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/dashboards.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">仪表板生成器</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/dashboards.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">应用程序仪表板</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/agileapp.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">八达通敏捷应用程序</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/daily-kwh.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">计算每日千瓦时</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/daily-averages.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">计算平均值</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/pulse-counting.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">脉冲计数</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/export-csv.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">导出 CSV</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/histograms.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">直方图</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/postprocess.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">后处理模块</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/demandshaper.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">需求塑造模块</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/import.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">导入/备份</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/update.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更新与升级</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/remoteaccess.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">远程访问</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emoncms/troubleshooting.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">故障排除</font></font></a></li>
+</ul>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">设计</font></font></strong></p>
+<ul dir="auto">
+<li><a href="/emoncms/emoncms/blob/master/docs/design/architecture.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms架构</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/design/input-processing.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输入处理实现</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/design/developing-a-new-module.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">开发新模块</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/design/global-variables.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms中的全局变量</font></font></a></li>
+</ul>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms时间序列数据库设计（提要存储）</font></font></strong></p>
+<ul dir="auto">
+<li><a href="/emoncms/emoncms/blob/master/docs/timeseries/History.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms时间序列数据库发展历史</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/timeseries/Fixed-interval.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">固定间隔时间序列</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/timeseries/Variable-interval.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">变间隔时间序列</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/timeseries/Write-load-investigation.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">通过缓冲提高写入性能</font></font></a></li>
+</ul>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">其他</font></font></strong></p>
+<ul dir="auto">
+<li><a href="/emoncms/emoncms/blob/master/docs/Backup.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">备份</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/CLI.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">命令行界面</font></font></a></li>
+<li><a href="/emoncms/emoncms/blob/master/docs/input_encrypted.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">加密输入</font></font></a></li>
+</ul>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms术语</font></font></strong></p>
+<ul dir="auto">
+<li><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输入：</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">传入的数据源。</font><font style="vertical-align: inherit;">每个输入都有一个关联的“节点”标识符和一个“键”子标识符。</font><font style="vertical-align: inherit;">输入是入口点，仅记录输入的最后一个值和时间。</font><font style="vertical-align: inherit;">要记录历史数据，需要根据输入创建提要。</font></font></li>
+<li><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输入：节点：</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输入或提要的分组标识符。</font></font></li>
+<li><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输入： 键：</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">每个节点内项目的子标识符。</font></font></li>
+<li><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输入进程列表（或输入处理）：</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在每个输入值上接收到该输入值时按顺序执行的进程*列表。</font></font></li>
+<li><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">进程：</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可以附加到输入的进程列表以更改值或将值保存到 feed* 的函数。</font></font></li>
+<li><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Feed：</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">记录数据的地方，数据点的时间序列。</font><font style="vertical-align: inherit;">Emoncms 使用的标准时间序列数据库是 PHPFina 和 PHPTimeSeries，它们是作为 Emoncms 项目的一部分编写的。</font></font></li>
+</ul>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">有关 Emoncms 中每个输入进程的作用的说明，请参阅 Emoncms 输入处理配置界面中的帮助说明。</font></font></li>
+</ul>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms.org API 参考</font></font></strong></p>
+<ul dir="auto">
+<li><a href="https://emoncms.org/site/api#input" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输入API参考</font></font></a></li>
+<li><a href="https://emoncms.org/site/api#feed" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">提要 API 参考</font></font></a></li>
+</ul>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装</font></font></h2><a id="user-content-install" class="anchor" aria-label="永久链接：安装" href="#install"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms 经过设计和测试，可在 Ubuntu Linux（本地、专用计算机或 VPS）或 RaspberryPi 操作系统上运行。</font><font style="vertical-align: inherit;">它应该可以在其他 Debian Linux 系统上运行，尽管我们没有测试或提供这些系统上的安装文档。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">我们不建议也无法支持在共享主机或 XAMPP 服务器上安装，特别是共享主机没有运行 emoncms 使用的某些脚本的功能或功能有限。</font><font style="vertical-align: inherit;">现在有多种低成本微型 Linux VPS 托管解决方案可供选择，它们以相似的成本提供更好的安装环境。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">受到推崇的：</font></font></p>
+<ul dir="auto">
+<li><a href="https://docs.openenergymonitor.org/emonsd/install.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 emonScripts 安装</font></font></a></li>
+<li><a href="https://docs.openenergymonitor.org/emonsd/download.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">预建 emonSD SD 卡镜像下载</font></font></a></li>
+<li><a href="http://shop.openenergymonitor.com/emonsd-pre-loaded-raspberry-pi-sd-card/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">购买预装 SD 卡</font></font></a></li>
+</ul>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">实验性（当前不是最新的）：</font></font></p>
+<ul dir="auto">
+<li><a href="https://github.com/emoncms/emoncms-docker"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 Docker 容器的多平台</font></font></a></li>
+</ul>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">模块</font></font></h2><a id="user-content-modules" class="anchor" aria-label="永久链接：模块" href="#modules"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可以通过下载或 git 克隆到 emoncms/Modules 文件夹来安装模块。</font><font style="vertical-align: inherit;">安装新模块后，请务必在“管理”菜单中检查数据库更新。</font><font style="vertical-align: inherit;">emonSD 映像中包含以下核心模块：</font></font></p>
+<ul dir="auto">
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/graph"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">图形模块</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">- 与 emoncms feed list 集成的高级图形模块，强烈推荐；</font><font style="vertical-align: inherit;">使用示例可以在 emoncms 指南</font></font><a href="http://guide.openenergymonitor.org/setup/daily-kwh" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[1] </font></font></a><a href="http://guide.openenergymonitor.org/setup/daily-averages/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[2] </font></font></a><a href="http://guide.openenergymonitor.org/setup/export-csv/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[3] </font></font></a><a href="http://guide.openenergymonitor.org/setup/histograms" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[4]</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">中找到。</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/device"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">设备模块</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">- 使用设备模板自动配置输入和源。</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/dashboard"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">仪表板模块</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">- 创建、查看和发布仪表板所需的。</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/app.git"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">应用程序模块</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">- 应用程序特定的仪表板，例如 MyElectric、MySolar。</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/config.git"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">配置</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">- 浏览器内 emonhub.conf 编辑器和 emonhub.log 日志查看器。</font><font style="vertical-align: inherit;">用于</font></font><code>git clone</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装。</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/wifi.git"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Wifi 模块</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">-</font></font><a href="https://guide.openenergymonitor.org/setup/connect/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">专为 emonPi 使用而设计的 Wifi 配置界面</font></font></a></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/backup"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Raspberry Pi 备份/恢复模块</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">(emonPi / emonBase)</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/sync"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">同步模块</font></font></a></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/usefulscripts"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Usefulscripts</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">：严格来说不是一个模块，更多的是与 emoncms 一起使用的有用脚本的集合。</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="http://github.com/emoncms/demandshaper"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">DemandShaper 模块</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">- 安排智能插头、EmonEVSE 智能电动汽车充电器、热泵在以下方面的最佳时间运行：碳、成本、电网压力。</font><font style="vertical-align: inherit;">基于日前的预测。</font></font></p>
+</li>
+</ul>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">还有许多其他可用的模块，例如事件模块和 openbem（开源建筑能源建模模块）：查看</font></font><a href="https://github.com/emoncms"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Emoncms 存储库列表</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">分支机构</font></font></h2><a id="user-content-branches" class="anchor" aria-label="永久链接： 分支机构" href="#branches"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<ul dir="auto">
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/emoncms"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">master</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> - 最新、最伟大的进展。</font><font style="vertical-align: inherit;">潜在错误，使用风险自负！</font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">所有拉取请求都应向主</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">分支发出</font><font style="vertical-align: inherit;">。</font></font></p>
+</li>
+<li>
+<p dir="auto"><a href="https://github.com/emoncms/emoncms/tree/stable"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">stable</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> - emonPi/emonBase 发布分支，定期从 master 合并。</font><font style="vertical-align: inherit;">经过更多尝试和测试。</font></font><a href="https://github.com/emoncms/emoncms/releases"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">请参阅发布变更日志</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+</li>
+</ul>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">工具</font></font></h2><a id="user-content-tools" class="anchor" aria-label="永久链接：工具" href="#tools"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<ul dir="auto">
+<li><a href="https://github.com/trystanlea/phpfinaview"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PHPFina 数据文件查看器</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">- 直接轻松浏览 phpfina timeseries feed 引擎数据文件，无需完整安装 Emoncms。</font><font style="vertical-align: inherit;">对于检查备份和存档数据很有用。</font></font></li>
+</ul>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安卓应用程序</font></font></h4><a id="user-content-android-app" class="anchor" aria-label="永久链接：Android 应用程序" href="#android-app"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><a href="https://play.google.com/store/apps/details?id=org.emoncms.myapps&amp;hl=en_GB" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">谷歌游戏</font></font></a></p>
+<p dir="auto"><a href="https://github.com/emoncms/AndroidApp"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">GitHub 存储库</font></font></a></p>
+<p dir="auto"><a href="https://community.openenergymonitor.org/c/emoncms/mobile-app" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">发展论坛</font></font></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更多信息</font></font></h2><a id="user-content-more-information" class="anchor" aria-label="永久链接：更多信息" href="#more-information"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">云托管平台 - </font></font><a href="http://emoncms.org" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">http://emoncms.org</font></font></a></li>
+<li><a href="https://community.openenergymonitor.org" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">OpenEnergyMonitor 论坛</font></font></a></li>
+<li><a href="https://openenergymonitor.org" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">OpenEnergyMonitor 主页</font></font></a></li>
+</ul>
+</article></div>
